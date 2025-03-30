@@ -1,3 +1,3 @@
-# TailQuest - With Discord Login
+# TailQuest - FINAL FINAL
 
-Includes working Discord login with username only.
+Includes working Discord login with username only. No type errors.

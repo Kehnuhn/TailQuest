@@ -1,3 +1,3 @@
-# TailQuest - TypeScript Ready
+# TailQuest - Final Version
 
-Upload to GitHub, connect to Vercel, and go live.
+Ready to upload to GitHub and deploy on Vercel.

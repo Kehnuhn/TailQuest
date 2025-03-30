@@ -1,3 +1,3 @@
-# TailQuest - Final Version
+# TailQuest - With Discord Login
 
-Ready to upload to GitHub and deploy on Vercel.
+Includes working Discord login with username only.

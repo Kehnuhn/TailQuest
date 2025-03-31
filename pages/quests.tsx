@@ -41,7 +41,6 @@ const joinQuest = async (questId: string) => {
     return;
   }
 
-  // Call the custom RPC function to append the user to the participants array
   const { data, error } = await supabase
     .rpc("append_participant", {
       quest_id: questId,
@@ -53,11 +52,16 @@ const joinQuest = async (questId: string) => {
     alert("Failed to join quest.");
   } else {
     alert("Successfully joined the quest!");
+
+    // Update the state, making sure participants is always an array of strings
     setQuests(quests.map((quest) =>
-      quest.id === questId ? { ...quest, participants: [...quest.participants, session.user.name] } : quest
+      quest.id === questId
+        ? { ...quest, participants: (quest.participants || []).filter(Boolean) } // Remove null/undefined
+        : quest
     ));
   }
 };
+
 
   // Delete quest functionality
   const deleteQuest = async (id: string) => {

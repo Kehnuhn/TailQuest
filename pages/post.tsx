@@ -5,8 +5,8 @@ import { supabase } from "../lib/supabase";
 export default function PostQuest() {
   const [objective, setObjective] = useState("");
   const [description, setDescription] = useState("");
-  const [roles, setRoles] = useState<string[]>([]); // Explicitly type roles as string[]
-  const [leadershipRoles, setLeadershipRoles] = useState<string[]>([]);
+  const [roles, setRoles] = useState([]);
+  const [leadershipRoles, setLeadershipRoles] = useState([]);
   const [time, setTime] = useState("");
   const router = useRouter();
 

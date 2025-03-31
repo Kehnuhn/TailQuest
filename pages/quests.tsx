@@ -34,7 +34,7 @@ export default function QuestBoard() {
     fetchQuests();
   }, []);
 
-  const joinQuest = async (questId: string) => {
+ const joinQuest = async (questId: string) => {
   if (!session) {
     alert("You need to be logged in to join a quest!");
     return;
@@ -43,11 +43,9 @@ export default function QuestBoard() {
   const { data, error } = await supabase
     .from("quests")
     .update({
-      participants: supabase
-        .from("quests")
-        .update({ participants: supabase.arrayAppend("participants", session.user.name) })
-        .eq("id", questId)
-    });
+      participants: supabase.raw('array_append(participants, ?)', [session.user.name]),
+    })
+    .eq("id", questId);
 
   if (error) {
     console.error("Error joining quest:", error);

@@ -76,9 +76,11 @@ export default function QuestBoard() {
   // Log session user name and quest creator for debugging
   useEffect(() => {
     if (session?.user) {
-      console.log("Session User:", session?.user); // Log entire session user
+      // Log session user for debugging (you can remove this line if not needed)
+      console.log("Session User:", session?.user);
     }
     quests.forEach((quest) => {
+      // Log quest creator for debugging (you can remove this line if not needed)
       console.log("Quest Created By (User ID):", quest.created_by); // Log quest creator ID
     });
   }, [session, quests]);
@@ -139,6 +141,9 @@ export default function QuestBoard() {
                   </span>
                 ))}
               </div>
+
+              <p className="text-yellow-300 mt-2">Posted By: {quest.created_by}</p> {/* Display the quest creator's name */}
+
               {quest.participants && !quest.participants.includes(session?.user?.name || "") && (
                 <button
                   onClick={() => joinQuest(quest.id)}

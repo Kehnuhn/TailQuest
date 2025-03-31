@@ -12,7 +12,7 @@ interface Quest {
   time: string | null;
   created_at: string;
   created_by: string; // Assuming created_by stores the name of the quest creator or user ID
-  participants: string[]; // Correctly typed as an array of strings
+  participants: string[];  // Correctly typed as an array of strings
 }
 
 export default function QuestBoard() {
@@ -27,8 +27,11 @@ export default function QuestBoard() {
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) console.error("Error loading quests:", error);
-      else setQuests(data);
+      if (error) {
+        console.error("Error loading quests:", error);
+      } else {
+        setQuests(data);
+      }
     };
 
     fetchQuests();
@@ -130,7 +133,7 @@ export default function QuestBoard() {
                 ))}
               </div>
 
-              {/* Display the quest creator's name */}
+              {/* Display the quest creator's name (if it's stored as user name) */}
               <p className="text-yellow-300 mt-2">Posted By: {quest.created_by}</p>
 
               {quest.participants && !quest.participants.includes(session?.user?.name || "") && (

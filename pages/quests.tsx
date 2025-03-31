@@ -35,33 +35,32 @@ export default function QuestBoard() {
   }, []);
 
   // Join quest functionality
-const joinQuest = async (questId: string) => {
-  if (!session?.user) {
-    alert("You need to be logged in to join a quest!");
-    return;
-  }
+  const joinQuest = async (questId: string) => {
+    if (!session?.user) {
+      alert("You need to be logged in to join a quest!");
+      return;
+    }
 
-  const { data, error } = await supabase
-    .rpc("append_participant", {
-      quest_id: questId,
-      participant: session.user.name,
-    });
+    const { data, error } = await supabase
+      .rpc("append_participant", {
+        quest_id: questId,
+        participant: session.user.name,
+      });
 
-  if (error) {
-    console.error("Error joining quest:", error);
-    alert("Failed to join quest.");
-  } else {
-    alert("Successfully joined the quest!");
+    if (error) {
+      console.error("Error joining quest:", error);
+      alert("Failed to join quest.");
+    } else {
+      alert("Successfully joined the quest!");
 
-    // Update the state, making sure participants is always an array of strings
-    setQuests(quests.map((quest) =>
-      quest.id === questId
-        ? { ...quest, participants: (quest.participants || []).filter(Boolean) } // Remove null/undefined
-        : quest
-    ));
-  }
-};
-
+      // Update the state, making sure participants is always an array of strings
+      setQuests(quests.map((quest) =>
+        quest.id === questId
+          ? { ...quest, participants: (quest.participants || []).filter(Boolean) } // Remove null/undefined
+          : quest
+      ));
+    }
+  };
 
   // Delete quest functionality
   const deleteQuest = async (id: string) => {
@@ -139,13 +138,10 @@ const joinQuest = async (questId: string) => {
                 </button>
               )}
 
-              {console.log("Session User Name:", session?.user?.name)}  {/* Log session username */}
-              {console.log("Quest Created By:", quest.created_by)}  {/* Log quest creator */}
-              
               {quest.participants && quest.participants.includes(session?.user?.name || "") && (
                 <span className="text-yellow-300 mt-4">You have joined this quest!</span>
               )}
-              
+
               {/* Conditional rendering for Delete button */}
               {session?.user?.name === quest.created_by && (
                 <button
@@ -155,8 +151,6 @@ const joinQuest = async (questId: string) => {
                   Delete Quest
                 </button>
               )}
-
-
             </div>
           ))}
         </div>

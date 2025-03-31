@@ -1,5 +1,6 @@
+
 import { useEffect, useState } from "react";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { supabase } from "../lib/supabase";
 
@@ -7,19 +8,29 @@ interface Quest {
   id: string;
   objective: string;
   description: string;
-  roles: string[];
+  roles: { [key: string]: number };
   leadership_roles: string[];
   time: string | null;
   created_at: string;
   created_by: string;
 }
 
+const allRoles = [
+  "PowerDPS", "CondiDPS", "AlacrityDPS", "QuicknessDPS",
+  "AlacrityHeal", "QuicknessHeal", "AlacrityTank", "QuicknessTank",
+  "Kiter", "Special Role(s)", "Other"
+];
+const leadershipRoles = ["Commander", "Lieutenant", "Mentor"];
+
 export default function QuestBoard() {
   const [quests, setQuests] = useState<Quest[]>([]);
+  const [showJoinForm, setShowJoinForm] = useState<string | null>(null);
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
   const { data: session } = useSession();
   const router = useRouter();
 
-  const superAdminUsername = "kehnuhn"; // Your Discord username or super admin username
+  const superAdminUsername = "kehnuhn";
 
   useEffect(() => {
     const fetchQuests = async () => {
@@ -35,85 +46,104 @@ export default function QuestBoard() {
     fetchQuests();
   }, []);
 
-  const deleteQuest = async (id: string) => {
-    const { error } = await supabase.from("quests").delete().eq("id", id);
+  const joinQuest = async (questId: string) => {
+    const username = session?.user?.name ?? "Unknown Adventurer";
+
+    const { data, error } = await supabase.from("participants").insert([
+      {
+        quest_id: questId,
+        user_name: username,
+        roles: selectedRoles,
+        leadership_roles: selectedLeads
+      }
+    ]);
+
     if (error) {
-      console.error("Error deleting quest:", error);
-      alert("Error deleting quest.");
+      console.error("Error joining quest:", error);
+      alert("Failed to join quest.");
     } else {
-      setQuests(quests.filter((quest) => quest.id !== id));
+      alert("Successfully joined the quest!");
+      setShowJoinForm(null);
+      setSelectedRoles([]);
+      setSelectedLeads([]);
     }
   };
 
   return (
     <div className="min-h-screen bg-black text-yellow-400 p-6 max-w-5xl mx-auto font-sans">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Quest Board</h1>
-        <div className="flex items-center gap-4">
-          {session?.user?.name && (
-            <span className="text-yellow-300">Hi, {session.user.name}</span>
-          )}
-          <button
-            onClick={() => router.push("/post")}
-            className="px-4 py-2 bg-yellow-600 text-black rounded-xl hover:bg-yellow-500"
-          >
-            Post Quest
-          </button>
-          <button
-            onClick={() => signOut({ callbackUrl: "/" })}
-            className="px-4 py-2 bg-yellow-700 text-black rounded-xl hover:bg-yellow-600"
-          >
-            Logout
-          </button>
-        </div>
-      </div>
+      <h1 className="text-3xl font-bold mb-6">Quest Board</h1>
+      {quests.map((quest) => (
+        <div key={quest.id} className="border border-yellow-400 p-4 mb-6 rounded-xl">
+          <h2 className="text-xl font-bold mb-2">{quest.objective}</h2>
+          <p className="mb-2">{quest.description}</p>
+          <p className="mb-2 text-sm italic">Created by: {quest.created_by}</p>
+          <p className="mb-2 text-sm">{quest.time ? `Scheduled: ${quest.time}` : "No time set"}</p>
 
-      {quests.length === 0 ? (
-        <p className="text-center text-yellow-300">No quests posted yet.</p>
-      ) : (
-        <div className="space-y-6">
-          {quests.map((quest) => (
-            <div
-              key={quest.id}
-              className="bg-gray-900 p-4 rounded-xl border border-yellow-700 shadow-md"
-            >
-              <h2 className="text-2xl font-bold text-yellow-300">{quest.objective}</h2>
-              <p className="mb-2 text-sm text-yellow-500">Posted: {new Date(quest.created_at).toLocaleString()}</p>
-              {quest.time && (
-                <p className="mb-2 text-yellow-500">Time: {new Date(quest.time).toLocaleString()}</p>
-              )}
-              <p className="mb-4 text-yellow-200">{quest.description}</p>
-              <div className="flex flex-wrap gap-2">
-                {quest.roles?.map((role, i) => (
-                  <span
-                    key={i}
-                    className="px-3 py-1 bg-yellow-700 text-black text-sm rounded-full shadow"
-                  >
-                    {role}
-                  </span>
-                ))}
-                {quest.leadership_roles?.map((role, i) => (
-                  <span
-                    key={i + 1000}
-                    className="px-3 py-1 bg-yellow-500 text-black text-sm rounded-full shadow border border-black"
-                  >
-                    {role}
-                  </span>
-                ))}
+          <button
+            onClick={() =>
+              setShowJoinForm(showJoinForm === quest.id ? null : quest.id)
+            }
+            className="bg-yellow-400 text-black px-4 py-2 rounded hover:bg-yellow-300 mb-2"
+          >
+            {showJoinForm === quest.id ? "Cancel" : "Join Quest"}
+          </button>
+
+          {showJoinForm === quest.id && (
+            <div className="bg-yellow-900 text-white p-4 mt-4 rounded">
+              <div className="mb-2">
+                <strong>Select Roles:</strong>
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  {allRoles.map((role) => (
+                    <label key={role}>
+                      <input
+                        type="checkbox"
+                        value={role}
+                        checked={selectedRoles.includes(role)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedRoles([...selectedRoles, role]);
+                          } else {
+                            setSelectedRoles(selectedRoles.filter((r) => r !== role));
+                          }
+                        }}
+                      />{" "}
+                      {role}
+                    </label>
+                  ))}
+                </div>
               </div>
-              {/* Ensure the delete button is visible for the creator or super admin */}
-              {(session?.user?.name === quest.created_by || session?.user?.name === superAdminUsername) && (
-                <button
-                  onClick={() => deleteQuest(quest.id)}
-                  className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-500 mt-4"
-                >
-                  Delete Quest
-                </button>
-              )}
+              <div className="mb-2 mt-4">
+                <strong>Select Leadership Roles:</strong>
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  {leadershipRoles.map((role) => (
+                    <label key={role}>
+                      <input
+                        type="checkbox"
+                        value={role}
+                        checked={selectedLeads.includes(role)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedLeads([...selectedLeads, role]);
+                          } else {
+                            setSelectedLeads(selectedLeads.filter((r) => r !== role));
+                          }
+                        }}
+                      />{" "}
+                      {role}
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <button
+                onClick={() => joinQuest(quest.id)}
+                className="bg-green-500 text-black px-4 py-2 rounded mt-4 hover:bg-green-400"
+              >
+                Confirm Join
+              </button>
             </div>
-          ))}
+          )}
         </div>
-      )}
+      ))}
     </div>
   );
 }

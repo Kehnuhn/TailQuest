@@ -1,1 +1,0 @@
-// Role selection UI component placeholder

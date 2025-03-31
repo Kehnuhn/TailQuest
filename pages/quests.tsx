@@ -35,26 +35,28 @@ export default function QuestBoard() {
   }, []);
 
   const joinQuest = async (questId: string) => {
-    if (!session) {
-      alert("You need to be logged in to join a quest!");
-      return;
-    }
+  if (!session) {
+    alert("You need to be logged in to join a quest!");
+    return;
+  }
 
-    const { data, error } = await supabase
-      .from("quests")
-      .update({
-        participants: supabase.raw('array_append(participants, ?)', [session.user.name]),
-      })
-      .eq("id", questId);
+  const { data, error } = await supabase
+    .from("quests")
+    .update({
+      participants: supabase
+        .from("quests")
+        .update({ participants: supabase.arrayAppend("participants", session.user.name) })
+        .eq("id", questId)
+    });
 
-    if (error) {
-      console.error("Error joining quest:", error);
-      alert("Failed to join quest.");
-    } else {
-      alert("Successfully joined the quest!");
-      setQuests(quests.map((quest) => (quest.id === questId ? { ...quest, participants: data[0].participants } : quest)));
-    }
-  };
+  if (error) {
+    console.error("Error joining quest:", error);
+    alert("Failed to join quest.");
+  } else {
+    alert("Successfully joined the quest!");
+    setQuests(quests.map((quest) => (quest.id === questId ? { ...quest, participants: data[0].participants } : quest)));
+  }
+};
 
   const deleteQuest = async (id: string) => {
     const { error } = await supabase.from("quests").delete().eq("id", id);

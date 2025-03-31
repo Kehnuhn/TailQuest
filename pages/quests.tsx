@@ -12,72 +12,59 @@ interface Quest {
   time: string | null;
   created_at: string;
   created_by: string;
-  participants: string[]; // Ensuring the participants is typed as a string array
+  participants: string[]; // Correctly typed as an array of strings
 }
 
-const joinQuest = async (questId: string) => {
-  if (!session?.user) {
-    alert("You need to be logged in to join a quest!");
-    return;
-  }
+export default function QuestBoard() {
+  const [quests, setQuests] = useState<Quest[]>([]);
+  const { data: session } = useSession();
+  const router = useRouter();
 
-  // Ensure data is of the type `Quest`
-  const { data, error } = await supabase
-    .from("quests")
-    .update({
-      participants: supabase.rpc('array_append', {
-        participants: session.user.name,
-      }),
-    })
-    .eq("id", questId)
-    .single();
+  useEffect(() => {
+    const fetchQuests = async () => {
+      const { data, error } = await supabase
+        .from("quests")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-  if (error) {
-    console.error("Error joining quest:", error);
-    alert("Failed to join quest.");
-  } else {
-    if (data) {
-      alert("Successfully joined the quest!");
-      setQuests(quests.map((quest) => (quest.id === questId ? { ...quest, participants: data.participants } : quest)));
-    } else {
-      alert("Quest data is not available.");
-    }
-  }
-};
-
+      if (error) console.error("Error loading quests:", error);
+      else setQuests(data);
+    };
 
     fetchQuests();
   }, []);
 
- const joinQuest = async (questId: string) => {
-  if (!session?.user) {
-    alert("You need to be logged in to join a quest!");
-    return;
-  }
-
-  const { data, error } = await supabase
-    .from("quests")
-    .update({
-      participants: supabase.rpc('array_append', {
-        participants: session.user.name,
-      }),
-    })
-    .eq("id", questId)
-    .single(); // Use .single() to fetch a single row
-
-  if (error) {
-    console.error("Error joining quest:", error);
-    alert("Failed to join quest.");
-  } else {
-    if (data) {
-      alert("Successfully joined the quest!");
-      setQuests(quests.map((quest) => (quest.id === questId ? { ...quest, participants: data.participants } : quest)));
-    } else {
-      alert("Quest data is not available.");
+  // Join quest functionality
+  const joinQuest = async (questId: string) => {
+    if (!session?.user) {
+      alert("You need to be logged in to join a quest!");
+      return;
     }
-  }
-};
 
+    const { data, error } = await supabase
+      .from("quests")
+      .update({
+        participants: supabase.rpc('array_append', {
+          participants: session.user.name,
+        }),
+      })
+      .eq("id", questId)
+      .single(); // Ensure it returns a single row
+
+    if (error) {
+      console.error("Error joining quest:", error);
+      alert("Failed to join quest.");
+    } else {
+      if (data) {
+        alert("Successfully joined the quest!");
+        setQuests(quests.map((quest) => (quest.id === questId ? { ...quest, participants: data.participants } : quest)));
+      } else {
+        alert("Quest data is not available.");
+      }
+    }
+  };
+
+  // Delete quest functionality
   const deleteQuest = async (id: string) => {
     const { error } = await supabase.from("quests").delete().eq("id", id);
     if (error) {

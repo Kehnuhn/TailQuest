@@ -12,14 +12,13 @@ interface Quest {
   time: string | null;
   created_at: string;
   created_by: string;
+  participants: string[];
 }
 
 export default function QuestBoard() {
   const [quests, setQuests] = useState<Quest[]>([]);
   const { data: session } = useSession();
   const router = useRouter();
-
-  const superAdminUsername = "kehnuhn"; // Your Discord username or super admin username
 
   useEffect(() => {
     const fetchQuests = async () => {
@@ -34,6 +33,28 @@ export default function QuestBoard() {
 
     fetchQuests();
   }, []);
+
+  const joinQuest = async (questId: string) => {
+    if (!session) {
+      alert("You need to be logged in to join a quest!");
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("quests")
+      .update({
+        participants: supabase.raw('array_append(participants, ?)', [session.user.name]),
+      })
+      .eq("id", questId);
+
+    if (error) {
+      console.error("Error joining quest:", error);
+      alert("Failed to join quest.");
+    } else {
+      alert("Successfully joined the quest!");
+      setQuests(quests.map((quest) => (quest.id === questId ? { ...quest, participants: data[0].participants } : quest)));
+    }
+  };
 
   const deleteQuest = async (id: string) => {
     const { error } = await supabase.from("quests").delete().eq("id", id);
@@ -101,8 +122,18 @@ export default function QuestBoard() {
                   </span>
                 ))}
               </div>
-              {/* Ensure the delete button is visible for the creator or super admin */}
-              {(session?.user?.name === quest.created_by || session?.user?.name === superAdminUsername) && (
+              {quest.participants && !quest.participants.includes(session?.user?.name) && (
+                <button
+                  onClick={() => joinQuest(quest.id)}
+                  className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-500 mt-4"
+                >
+                  Join Quest
+                </button>
+              )}
+              {quest.participants && quest.participants.includes(session?.user?.name) && (
+                <span className="text-yellow-300 mt-4">You have joined this quest!</span>
+              )}
+              {(session?.user?.name === quest.created_by) && (
                 <button
                   onClick={() => deleteQuest(quest.id)}
                   className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-500 mt-4"

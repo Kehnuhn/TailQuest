@@ -43,7 +43,9 @@ export default function QuestBoard() {
   const { data, error } = await supabase
     .from("quests")
     .update({
-      participants: supabase.raw('array_append(participants, ?)', [session.user.name]),
+      participants: supabase.rpc('array_append', {
+        participants: session.user.name,
+      }),
     })
     .eq("id", questId);
 

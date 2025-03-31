@@ -139,7 +139,7 @@ const joinQuest = async (questId: string) => {
                 </button>
               )}
 
-              {quest.participants && quest.participants.includes(session?.user?.name) && (
+              {quest.participants && quest.participants.includes(session?.user?.name || "") && (
                 <span className="text-yellow-300 mt-4">You have joined this quest!</span>
               )}
               {(session?.user?.name === quest.created_by) && (

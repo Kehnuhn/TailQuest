@@ -76,12 +76,10 @@ export default function QuestBoard() {
   // Log session user name and quest creator for debugging
   useEffect(() => {
     if (session?.user) {
-      // Log session user for debugging (you can remove this line if not needed)
-      console.log("Session User:", session?.user);
+      console.log("Session User:", session?.user); // Log entire session user for debugging
     }
     quests.forEach((quest) => {
-      // Log quest creator for debugging (you can remove this line if not needed)
-      console.log("Quest Created By (User ID):", quest.created_by); // Log quest creator ID
+      console.log("Quest Created By (User ID):", quest.created_by); // Log quest creator ID for debugging
     });
   }, [session, quests]);
 

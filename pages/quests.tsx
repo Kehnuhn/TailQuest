@@ -35,7 +35,7 @@ export default function QuestBoard() {
   }, []);
 
  const joinQuest = async (questId: string) => {
-  if (!session) {
+  if (!session?.user) {
     alert("You need to be logged in to join a quest!");
     return;
   }

@@ -41,13 +41,10 @@ const joinQuest = async (questId: string) => {
     return;
   }
 
-  // Directly use SQL function to append to participants
   const { data, error } = await supabase
     .from("quests")
     .update({
-      participants: supabase
-        .from("quests")
-        .rpc("array_append", { participants: session.user.name }),
+      participants: supabase.raw("array_append(participants, ?)", [session.user.name]),
     })
     .eq("id", questId)
     .single(); // Fetch a single row

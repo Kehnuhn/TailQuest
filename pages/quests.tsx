@@ -150,6 +150,7 @@ const joinQuest = async (questId: string) => {
                   Delete Quest
                 </button>
               )}
+
             </div>
           ))}
         </div>

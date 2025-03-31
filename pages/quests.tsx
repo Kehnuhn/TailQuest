@@ -47,14 +47,19 @@ export default function QuestBoard() {
         participants: session.user.name,
       }),
     })
-    .eq("id", questId);
+    .eq("id", questId)
+    .single(); // Use .single() to fetch a single row
 
   if (error) {
     console.error("Error joining quest:", error);
     alert("Failed to join quest.");
   } else {
-    alert("Successfully joined the quest!");
-    setQuests(quests.map((quest) => (quest.id === questId ? { ...quest, participants: data[0].participants } : quest)));
+    if (data) {
+      alert("Successfully joined the quest!");
+      setQuests(quests.map((quest) => (quest.id === questId ? { ...quest, participants: data.participants } : quest)));
+    } else {
+      alert("Quest data is not available.");
+    }
   }
 };
 

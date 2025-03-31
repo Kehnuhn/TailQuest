@@ -76,10 +76,10 @@ export default function QuestBoard() {
   // Log session user name and quest creator for debugging
   useEffect(() => {
     if (session?.user) {
-      console.log("Session User Name:", session.user.name); // Log session username
+      console.log("Session User ID:", session.user.id); // Log session user ID
     }
     quests.forEach((quest) => {
-      console.log("Quest Created By:", quest.created_by); // Log quest creator
+      console.log("Quest Created By (User ID):", quest.created_by); // Log quest creator ID
     });
   }, [session, quests]);
 
@@ -153,7 +153,7 @@ export default function QuestBoard() {
               )}
 
               {/* Conditional rendering for Delete button */}
-              {session?.user?.name === quest.created_by && (
+              {session?.user?.id === quest.created_by && (
                 <button
                   onClick={() => deleteQuest(quest.id)}
                   className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-500 mt-4"

@@ -11,7 +11,7 @@ interface Quest {
   leadership_roles: string[];
   time: string | null;
   created_at: string;
-  created_by: string;  // Assuming created_by is stored as Discord user ID
+  created_by: string; // Assuming created_by stores the name of the quest creator or user ID
   participants: string[]; // Correctly typed as an array of strings
 }
 
@@ -72,16 +72,6 @@ export default function QuestBoard() {
       setQuests(quests.filter((quest) => quest.id !== id));
     }
   };
-
-  // Log session user name and quest creator for debugging
-  useEffect(() => {
-    if (session?.user) {
-      console.log("Session User:", session?.user); // Log entire session user for debugging
-    }
-    quests.forEach((quest) => {
-      console.log("Quest Created By (User ID):", quest.created_by); // Log quest creator ID for debugging
-    });
-  }, [session, quests]);
 
   return (
     <div className="min-h-screen bg-black text-yellow-400 p-6 max-w-5xl mx-auto font-sans">

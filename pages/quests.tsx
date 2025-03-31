@@ -73,6 +73,16 @@ export default function QuestBoard() {
     }
   };
 
+  // Log session user name and quest creator for debugging
+  useEffect(() => {
+    if (session?.user) {
+      console.log("Session User Name:", session.user.name); // Log session username
+    }
+    quests.forEach((quest) => {
+      console.log("Quest Created By:", quest.created_by); // Log quest creator
+    });
+  }, [session, quests]);
+
   return (
     <div className="min-h-screen bg-black text-yellow-400 p-6 max-w-5xl mx-auto font-sans">
       <div className="flex justify-between items-center mb-6">
@@ -141,10 +151,6 @@ export default function QuestBoard() {
               {quest.participants && quest.participants.includes(session?.user?.name || "") && (
                 <span className="text-yellow-300 mt-4">You have joined this quest!</span>
               )}
-
-              {/* Logging session user name and quest creator for debugging */}
-              {console.log("Session User Name:", session?.user?.name)} {/* Log session username */}
-              {console.log("Quest Created By:", quest.created_by)} {/* Log quest creator */}
 
               {/* Conditional rendering for Delete button */}
               {session?.user?.name === quest.created_by && (

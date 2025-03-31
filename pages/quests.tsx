@@ -11,8 +11,8 @@ interface Quest {
   leadership_roles: string[];
   time: string | null;
   created_at: string;
-  created_by: string;  // Assuming created_by stores the name of the quest creator or user ID
-  participants: string[];  // Correctly typed as an array of strings
+  created_by: string;  // Store the creator's name here
+  participants: string[]; // Array of participant names
 }
 
 export default function QuestBoard() {
@@ -56,10 +56,10 @@ export default function QuestBoard() {
     } else {
       alert("Successfully joined the quest!");
 
-      // Update the state, making sure participants is always an array of strings
+      // Update the state
       setQuests(quests.map((quest) =>
         quest.id === questId
-          ? { ...quest, participants: (quest.participants || []).filter(Boolean) } // Remove null/undefined
+          ? { ...quest, participants: [...quest.participants, session.user.name] } // Add user to participants list
           : quest
       ));
     }
@@ -133,7 +133,7 @@ export default function QuestBoard() {
                 ))}
               </div>
 
-              {/* Display the quest creator's name (using session.user.name if available) */}
+              {/* Display the quest creator's name */}
               <p className="text-yellow-300 mt-2">Posted By: {quest.created_by}</p>
 
               {quest.participants && !quest.participants.includes(session?.user?.name || "") && (

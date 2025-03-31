@@ -11,7 +11,7 @@ interface Quest {
   leadership_roles: string[];
   time: string | null;
   created_at: string;
-  created_by: string; // Assuming created_by stores the name of the quest creator or user ID
+  created_by: string;  // Assuming created_by stores the name of the quest creator or user ID
   participants: string[];  // Correctly typed as an array of strings
 }
 
@@ -133,7 +133,7 @@ export default function QuestBoard() {
                 ))}
               </div>
 
-              {/* Display the quest creator's name (if it's stored as user name) */}
+              {/* Display the quest creator's name (using session.user.name if available) */}
               <p className="text-yellow-300 mt-2">Posted By: {quest.created_by}</p>
 
               {quest.participants && !quest.participants.includes(session?.user?.name || "") && (

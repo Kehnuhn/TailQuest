@@ -76,11 +76,7 @@ export default function QuestBoard() {
   // Log session user name and quest creator for debugging
   useEffect(() => {
     if (session?.user) {
-      // Check if session.user contains id
-      console.log("Session User:", session?.user);  // Log entire session user
-      if (session?.user?.id) {
-        console.log("Session User ID:", session.user.id); // Log session user ID if available
-      }
+      console.log("Session User:", session?.user); // Log entire session user
     }
     quests.forEach((quest) => {
       console.log("Quest Created By (User ID):", quest.created_by); // Log quest creator ID
@@ -157,7 +153,7 @@ export default function QuestBoard() {
               )}
 
               {/* Conditional rendering for Delete button */}
-              {session?.user?.id === quest.created_by && (
+              {session?.user?.name === quest.created_by && (
                 <button
                   onClick={() => deleteQuest(quest.id)}
                   className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-500 mt-4"

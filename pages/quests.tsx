@@ -142,7 +142,7 @@ const joinQuest = async (questId: string) => {
               {quest.participants && quest.participants.includes(session?.user?.name || "") && (
                 <span className="text-yellow-300 mt-4">You have joined this quest!</span>
               )}
-              {(session?.user?.name === quest.created_by) && (
+              {session?.user?.name === quest.created_by && (
                 <button
                   onClick={() => deleteQuest(quest.id)}
                   className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-500 mt-4"
@@ -150,6 +150,7 @@ const joinQuest = async (questId: string) => {
                   Delete Quest
                 </button>
               )}
+
 
             </div>
           ))}

@@ -11,7 +11,7 @@ interface Quest {
   leadership_roles: string[];
   time: string | null;
   created_at: string;
-  created_by: string;
+  created_by: string;  // Assuming created_by is stored as Discord user ID
   participants: string[]; // Correctly typed as an array of strings
 }
 
@@ -140,7 +140,8 @@ export default function QuestBoard() {
                 ))}
               </div>
 
-              <p className="text-yellow-300 mt-2">Posted By: {quest.created_by}</p> {/* Display the quest creator's name */}
+              {/* Display the quest creator's name */}
+              <p className="text-yellow-300 mt-2">Posted By: {quest.created_by}</p>
 
               {quest.participants && !quest.participants.includes(session?.user?.name || "") && (
                 <button

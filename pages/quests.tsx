@@ -41,30 +41,23 @@ const joinQuest = async (questId: string) => {
     return;
   }
 
+  // Call the custom RPC function to append the user to the participants array
   const { data, error } = await supabase
-    .from("quests")
-    .update({
-      participants: supabase.raw("array_append(participants, ?)", [session.user.name]),
-    })
-    .eq("id", questId)
-    .single(); // Fetch a single row
+    .rpc("append_participant", {
+      quest_id: questId,
+      participant: session.user.name,
+    });
 
   if (error) {
     console.error("Error joining quest:", error);
     alert("Failed to join quest.");
   } else {
-    if (data) {
-      alert("Successfully joined the quest!");
-      setQuests(quests.map((quest) =>
-        quest.id === questId ? { ...quest, participants: data.participants } : quest
-      ));
-    } else {
-      alert("Quest data is not available.");
-    }
+    alert("Successfully joined the quest!");
+    setQuests(quests.map((quest) =>
+      quest.id === questId ? { ...quest, participants: [...quest.participants, session.user.name] } : quest
+    ));
   }
 };
-
-
 
   // Delete quest functionality
   const deleteQuest = async (id: string) => {

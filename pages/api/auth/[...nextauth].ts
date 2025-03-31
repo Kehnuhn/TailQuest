@@ -4,12 +4,13 @@ import DiscordProvider from "next-auth/providers/discord";
 export default NextAuth({
   providers: [
     DiscordProvider({
-      clientId: process.env.DISCORD_CLIENT_ID!, // Non-null assertion
-      clientSecret: process.env.DISCORD_CLIENT_SECRET!, // Non-null assertion
+      clientId: process.env.DISCORD_CLIENT_ID!,
+      clientSecret: process.env.DISCORD_CLIENT_SECRET!,
     }),
   ],
-  secret: process.env.NEXTAUTH_SECRET!, // Ensure this is set in your environment
+  secret: process.env.NEXTAUTH_SECRET!,
   pages: {
-    error: '/api/auth/error',  // Optional: Custom error page
+    error: '/api/auth/error', // Error page URL
+    signIn: '/auth/signin', // Optional: Specify a custom login page
   },
 });

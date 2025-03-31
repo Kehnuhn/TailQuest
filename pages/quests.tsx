@@ -35,17 +35,19 @@ export default function QuestBoard() {
   }, []);
 
   // Join quest functionality
- const joinQuest = async (questId: string) => {
+const joinQuest = async (questId: string) => {
   if (!session?.user) {
     alert("You need to be logged in to join a quest!");
     return;
   }
 
-  // Update the quest with participants
+  // Directly use SQL function to append to participants
   const { data, error } = await supabase
     .from("quests")
     .update({
-      participants: supabase.raw('array_append(participants, ?)', [session.user.name]),
+      participants: supabase
+        .from("quests")
+        .rpc("array_append", { participants: session.user.name }),
     })
     .eq("id", questId)
     .single(); // Fetch a single row
@@ -54,10 +56,8 @@ export default function QuestBoard() {
     console.error("Error joining quest:", error);
     alert("Failed to join quest.");
   } else {
-    // Explicitly define the type for data
     if (data) {
       alert("Successfully joined the quest!");
-      // TypeScript is now aware of the participants field
       setQuests(quests.map((quest) =>
         quest.id === questId ? { ...quest, participants: data.participants } : quest
       ));
@@ -66,6 +66,7 @@ export default function QuestBoard() {
     }
   }
 };
+
 
 
   // Delete quest functionality
